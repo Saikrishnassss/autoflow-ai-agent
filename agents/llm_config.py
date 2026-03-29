@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 
 load_dotenv()
 
@@ -9,22 +9,22 @@ _llm_instance = None
 def get_llm():
     """
     Returns a singleton LLM instance.
-    Switched to Google Gemini 1.5 Pro to bypass OpenAI billing limits.
+    Switched to Groq (Llama-3.3-70b) for absolutely free, unthrottled, region-independent API access.
     """
     global _llm_instance
     if _llm_instance is not None:
         return _llm_instance
 
-    api_key = os.getenv("GOOGLE_API_KEY")
+    api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
         raise EnvironmentError(
-            "GOOGLE_API_KEY not found. "
+            "GROQ_API_KEY not found. "
             "Please add it to the Render Environment Variables."
         )
 
-    # === ACTIVE: Google Gemini ===
-    _llm_instance = ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash-latest",
+    # === ACTIVE: Groq Llama 3 ===
+    _llm_instance = ChatGroq(
+        model="llama-3.3-70b-versatile",
         temperature=0.0,
         request_timeout=60,
     )

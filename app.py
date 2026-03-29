@@ -102,10 +102,10 @@ def api_run():
     if not data or "text" not in data or "scenario" not in data:
         return jsonify({"error": "Missing 'text' or 'scenario' in request"}), 400
 
-    if not os.getenv("GOOGLE_API_KEY"):
+    if not os.getenv("GROQ_API_KEY"):
         return jsonify({
             "error": "Backend Configuration Error",
-            "logs": ["ERROR: GOOGLE_API_KEY not found in server environment variables. Please configure it in Render to run the Gemini model."]
+            "logs": ["ERROR: GROQ_API_KEY not found in server environment variables. Please configure it in Render to run the Groq Llama-3 model."]
         }), 500
 
     try:
