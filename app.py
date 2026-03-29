@@ -3,22 +3,40 @@ from agents.planner import create_plan
 from agents.executor import execute
 from agents.monitor import monitor
 from agents.recovery import recover
+
+import os
 import datetime
 
 
-# ✅ Enterprise-style audit logging
+# =========================
+# ✅ Enterprise Audit Logging (FIXED FOR DEPLOYMENT)
+# =========================
 def log_event(event):
+    # Ensure logs folder exists
+    if not os.path.exists("logs"):
+        os.makedirs("logs")
+
+    # Ensure log file exists
+    if not os.path.exists("logs/audit.log"):
+        with open("logs/audit.log", "w") as f:
+            f.write("=== AutoFlow AI Audit Log ===\n")
+
+    # Add timestamp
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     entry = f"[{timestamp}] {event}"
 
     print("AUDIT:", entry)
 
+    # Write to file
     with open("logs/audit.log", "a") as f:
         f.write(entry + "\n")
 
 
+# =========================
+# 🚀 CORE SYSTEM
+# =========================
 def run_system(meeting_text):
-    log_event("SYSTEM STARTED")
+    log_event("Workflow execution started")
 
     # =========================
     # 🧠 Understanding Phase
@@ -61,14 +79,16 @@ def run_system(meeting_text):
         print("\n=== Monitoring Phase ===")
         issues = monitor(workflow)
 
-        # 🔥 SLA Detection (FIXED)
+        # 🔥 SLA Detection
         for task in workflow:
             if (
                 "urgent" in task["task"].lower()
                 or "immediate" in task.get("deadline", "").lower()
             ):
                 if "High SLA risk detected → priority handling enabled" not in task["history"]:
-                    task["history"].append("High SLA risk detected → priority handling enabled")
+                    task["history"].append(
+                        "High SLA risk detected → priority handling enabled"
+                    )
 
         # 🔁 Recovery Phase
         if issues:
@@ -87,7 +107,7 @@ def run_system(meeting_text):
             if t["status"] == "retrying":
                 t["status"] = "failed"
 
-    log_event("SYSTEM COMPLETED")
+    log_event("Workflow execution completed successfully")
     return workflow
 
 
