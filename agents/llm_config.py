@@ -24,7 +24,7 @@ def get_llm():
 
     # === ACTIVE: Google Gemini ===
     _llm_instance = ChatGoogleGenerativeAI(
-        model="gemini-1.5-pro",
+        model="gemini-1.5-flash",
         temperature=0.0,
         request_timeout=60,
     )
