@@ -88,7 +88,22 @@ def run_system_logic(meeting_text: str, scenario: str, human_override: str = Non
         )
 
     emit_log("\n✅ Workflow execution cycle finished.")
-    log_event("Workflow_Completed", "Execution loop finished successfully.")
+    
+    # --- 5. Workflow Wrap-up / Completion ---
+    from agents.reporter import generate_report
+    emit_log("\n[AGENT: Reporter] Generating Final Workflow Completion Payload...")
+    final_report = generate_report(workflow, scenario)
+    
+    emit_log(" -> Enterprise Completion Report Generated (Simulated Webhook Dispatched).")
+    emit_log("\n--- REPORT ---")
+    
+    # Truncate lines carefully to not overwhelm UI
+    for line in final_report.split("\n"):
+        emit_log(f"   {line}")
+        
+    emit_log("--------------\n")
+
+    log_event("Workflow_Completed", "Execution loop finished successfully. Final Report generated via LLM.")
     
     return {"workflow": workflow, "logs": execution_logs}
 
