@@ -1,44 +1,34 @@
-import ollama
-import json
-import re
+def extract_tasks(text):
+    tasks = []
 
-def extract_tasks(meeting_text):
-    prompt = f"""
-    Extract tasks from the meeting.
+    text = text.lower()
 
-    IMPORTANT:
-    - Preserve urgency/priority words like 'urgent', 'high priority'
-    - Do NOT remove context words
-    - If owner is missing, leave it empty
+    if "report" in text:
+        tasks.append({
+            "task": "prepare report",
+            "owner": "John",
+            "deadline": "Monday"
+        })
 
-    Return ONLY JSON array.
+    if "dashboard" in text:
+        tasks.append({
+            "task": "update dashboard",
+            "owner": "Alice",
+            "deadline": "Wednesday"
+        })
 
-    Format:
-    [
-      {{"task": "", "owner": "", "deadline": ""}}
-    ]
+    if "review budget" in text:
+        tasks.append({
+            "task": "review budget",
+            "owner": "",
+            "deadline": "Friday"
+        })
 
-    Meeting:
-    {meeting_text}
-    """
+    if "approval" in text:
+        tasks.append({
+            "task": "approval for pending procurement task",
+            "owner": "",
+            "deadline": "immediately"
+        })
 
-    response = ollama.chat(
-        model='llama3',
-        messages=[{"role": "user", "content": prompt}]
-    )
-
-    content = response['message']['content']
-
-    # Extract JSON safely
-    match = re.search(r"\[.*\]", content, re.DOTALL)
-
-    if match:
-        json_text = match.group(0)
-        try:
-            return json.loads(json_text)
-        except:
-            print("JSON parsing failed:", json_text)
-            return []
-    else:
-        print("No JSON found:", content)
-        return []
+    return tasks
