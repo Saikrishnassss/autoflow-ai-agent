@@ -1,23 +1,29 @@
-def execute(workflow):
-    for task in workflow:
+import random
 
+def execute(workflow: list, scenario: str = "") -> list:
+    for task in workflow:
         if task["status"] not in ["pending", "retrying"]:
             continue
 
         task_name = task["task"].lower()
-
-        # SLA-aware failure simulation
-        if any(word in task_name for word in ["urgent", "dashboard", "review"]):
-            task["status"] = "failed"
-            task["history"].append(
-                "Execution failed → high SLA risk task (urgent/complex)"
-            )
-            task["history"].append("Simulated API call → Task execution service")
-
-        else:
-            task["status"] = "completed"
-            task["history"].append(
-                "Task completed successfully without SLA risk"
-            )
-
+        
+        # Determine success / failure based on the scenario we are simulating
+        
+        # Scenario 1 (Track 2): Employee Onboarding -> simulating JIRA access error
+        if scenario == "employee_onboarding":
+            if "jira" in task_name or "system" in task_name or "account" in task_name:
+                # Force failure if it's the first attempt
+                if task["attempts"] == 0:
+                    task["status"] = "failed"
+                    task["history"].append("Execution failed: JIRA API Access Error (HTTP 403 Forbidden)")
+                else:
+                    # Fail again on retry to trigger escalation logic to IT
+                    task["status"] = "failed"
+                    task["history"].append("Execution failed: JIRA API Access Error persists after retry")
+                continue
+        
+        # If it passes scenario constraints or is another task, execute properly
+        task["status"] = "completed"
+        task["history"].append(f"Task executed successfully (Simulated API call)")
+        
     return workflow

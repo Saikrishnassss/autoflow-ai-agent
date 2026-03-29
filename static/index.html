@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoFlow AI | Enterprise Agent</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0B0D17;
+            --surface-color: rgba(255, 255, 255, 0.03);
+            --surface-hover: rgba(255, 255, 255, 0.08);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            --secondary: #ec4899;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 15% 50%, var(--primary-glow), transparent 25%),
+                              radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.2), transparent 25%);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(11, 13, 23, 0.8);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #818cf8, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.05em;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            font-weight: 300;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            flex-grow: 1;
+        }
+
+        /* Glassmorphism Panels */
+        .panel {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .panel:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .panel h2 {
+            margin-top: 0;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Forms & Inputs */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        select, textarea, input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        select:focus, textarea:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        button.btn-run {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button.btn-run::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255,255,255,0.2);
+            transform: rotate(45deg);
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+
+        button.btn-run:hover::after {
+            opacity: 1;
+            transform: rotate(45deg) translate(50%, 50%);
+        }
+
+        button.btn-run:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 20px rgba(236, 72, 153, 0.3);
+        }
+
+        button.btn-run:active {
+            transform: scale(0.98);
+        }
+        
+        button.btn-run:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Terminal Output */
+        .terminal {
+            background: #000;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            color: #10b981;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            overflow-y: auto;
+            flex-grow: 1;
+            max-height: 400px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .log-line {
+            margin-bottom: 0.5rem;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .log-error { color: var(--danger); }
+        .log-warn { color: var(--warning); }
+        .log-agent { color: #818cf8; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Workflow Results */
+        .task-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0 8px 8px 0;
+            animation: slideIn 0.4s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-completed { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .status-failed { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .status-escalated { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .status-rerouted { background: rgba(99, 102, 241, 0.2); color: var(--primary); }
+        .status-needs_clarification { background: rgba(236, 72, 153, 0.2); color: var(--secondary); }
+
+        .spinner {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loader-active .spinner { display: block; }
+        .loader-active .btn-text { display: none; }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>AutoFlow AI</h1>
+        <p class="subtitle">Autonomous Enterprise Workflow Orchestrator</p>
+    </header>
+
+    <div class="container">
+        <!-- Control Panel -->
+        <div class="panel">
+            <h2>Configure Workflow</h2>
+            
+            <div class="form-group">
+                <label for="scenario">Select Hackathon Scenario</label>
+                <select id="scenario" onchange="updatePlaceholder()">
+                    <option value="employee_onboarding">1. Employee Onboarding (JIRA API Error -> Escalate)</option>
+                    <option value="meeting_to_action">2. Meeting to Action (Ambiguity Clarification)</option>
+                    <option value="sla_breach">3. SLA Breach Prevention (Stuck Approval Reroute)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="input-text">Input Data / Transcript</label>
+                <textarea id="input-text" placeholder="Enter meeting transcript or unstructured data here..."></textarea>
+            </div>
+
+            <div class="form-group" id="clarification-group" style="display:none;">
+                <label for="override">Clarification Override (Owner)</label>
+                <input type="text" id="override" value="Manager" placeholder="e.g. System Admin">
+            </div>
+
+            <button class="btn-run" id="run-btn" onclick="executeWorkflow()">
+                <span class="btn-text">Execute Workflow</span>
+                <div class="spinner"></div>
+            </button>
+        </div>
+
+        <!-- Output Panel -->
+        <div class="panel">
+            <h2>Live Execution Stream</h2>
+            <div class="terminal" id="terminal">
+                <div class="log-line">System initialized. Waiting for task...</div>
+            </div>
+            
+            <h2 style="margin-top: 2rem;">Final State</h2>
+            <div id="results" style="overflow-y:auto; max-height:300px;">
+                <!-- Task Results Injected Here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const scenarios = {
+            "employee_onboarding": "Task: Create accounts across JIRA, Slack, and Email for the new hire Bob. Assign a buddy to Bob. Schedule orientation meetings for next week. Send the welcome pack. All by Friday.",
+            "meeting_to_action": "John will prepare the report by Monday. Alice will update the dashboard urgently by Wednesday. The team needs to review the budget by Friday, but no one was explicitly assigned to lead it.",
+            "sla_breach": "Pending procurement approval request from Sarah. Needs immediate attention."
+        };
+
+        function updatePlaceholder() {
+            const sc = document.getElementById('scenario').value;
+            document.getElementById('input-text').value = scenarios[sc];
+            
+            if(sc === 'meeting_to_action') {
+                document.getElementById('clarification-group').style.display = 'block';
+            } else {
+                document.getElementById('clarification-group').style.display = 'none';
+            }
+        }
+
+        // Init
+        updatePlaceholder();
+
+        async function executeWorkflow() {
+            const btn = document.getElementById('run-btn');
+            const term = document.getElementById('terminal');
+            const res = document.getElementById('results');
+            
+            const text = document.getElementById('input-text').value;
+            const scenario = document.getElementById('scenario').value;
+            const override = document.getElementById('override').value;
+
+            btn.classList.add('loader-active');
+            btn.disabled = true;
+            term.innerHTML = '';
+            res.innerHTML = '';
+
+            try {
+                const response = await fetch('/api/run', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, scenario, override })
+                });
+
+                const data = await response.json();
+
+                if(response.ok) {
+                    // Render Logs with simulated typing delay for effect
+                    data.logs.forEach((log, index) => {
+                        setTimeout(() => {
+                            const p = document.createElement('div');
+                            p.className = 'log-line';
+                            
+                            // Colorize
+                            if(log.includes("🚨") || log.includes("failed")) p.classList.add("log-error");
+                            else if(log.includes("⚠️")) p.classList.add("log-warn");
+                            else if(log.includes("[AGENT")) p.classList.add("log-agent");
+
+                            p.innerText = log;
+                            term.appendChild(p);
+                            term.scrollTop = term.scrollHeight; // Auto-scroll
+                        }, index * 100); 
+                    });
+
+                    // Render Final State
+                    setTimeout(() => {
+                        data.workflow.forEach(task => {
+                            const card = document.createElement('div');
+                            card.className = 'task-card';
+                            
+                            let colorClass = 'status-completed';
+                            if(task.status === 'failed') colorClass = 'status-failed';
+                            if(task.status === 'escalated') colorClass = 'status-escalated';
+                            if(task.status === 'rerouted') colorClass = 'status-rerouted';
+                            if(task.status === 'needs_clarification') colorClass = 'status-needs_clarification';
+
+                            card.innerHTML = `
+                                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                    <strong>${task.task}</strong>
+                                    <span class="status-badge ${colorClass}">${task.status}</span>
+                                </div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+                                    <div><strong>Owner:</strong> ${task.owner}</div>
+                                    <div style="margin-top:0.5rem;"><em>Latest Event:</em> ${task.history[task.history.length-1]}</div>
+                                </div>
+                            `;
+                            res.appendChild(card);
+                        });
+                    }, data.logs.length * 100 + 200);
+
+                } else {
+                    term.innerHTML = `<div class="log-line log-error">Error: ${data.error}</div>`;
+                    if(data.logs) {
+                        data.logs.forEach(l => term.innerHTML += `<div class="log-line">${l}</div>`);
+                    }
+                }
+
+            } catch(e) {
+                term.innerHTML = `<div class="log-line log-error">Network Error: Could not connect to backend. Is Flask running?</div>`;
+            }
+
+            btn.classList.remove('loader-active');
+            btn.disabled = false;
+        }
+    </script>
+</body>
+</html>
