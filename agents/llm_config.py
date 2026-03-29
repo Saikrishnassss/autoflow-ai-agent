@@ -24,9 +24,9 @@ def get_llm():
             "Create a .env file with: OPENAI_API_KEY=sk-..."
         )
 
-    # === PRIMARY: OpenAI GPT-4o ===
+    # === PRIMARY: OpenAI GPT-4o-mini ===
     _llm_instance = ChatOpenAI(
-        model="gpt-4o",
+        model="gpt-4o-mini",
         temperature=0.0,
         request_timeout=60,
     )
