@@ -38,4 +38,4 @@ def extract_tasks(text: str) -> list:
         return tasks
     except Exception as e:
         print(f"Error extracting tasks: {e}")
-        raise Exception(f"OpenAI Task Extraction Failed. Please check your API Key and billing status. Detail: {str(e)}")
+        raise Exception(f"AI Task Extraction Failed. Please check your Google Gemini API Key. Detail: {str(e)}")

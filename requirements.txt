@@ -2,7 +2,7 @@ flask
 flask-cors
 gunicorn
 langchain
-langchain-openai
+langchain-google-genai
 langchain-core
 pydantic
 python-dotenv

@@ -102,10 +102,10 @@ def api_run():
     if not data or "text" not in data or "scenario" not in data:
         return jsonify({"error": "Missing 'text' or 'scenario' in request"}), 400
 
-    if not os.getenv("OPENAI_API_KEY"):
+    if not os.getenv("GOOGLE_API_KEY"):
         return jsonify({
             "error": "Backend Configuration Error",
-            "logs": ["ERROR: OPENAI_API_KEY not found in server environment variables. Please configure it to run the model."]
+            "logs": ["ERROR: GOOGLE_API_KEY not found in server environment variables. Please configure it in Render to run the Gemini model."]
         }), 500
 
     try:
